@@ -1,0 +1,197 @@
+<div class="pagina-wrapper">
+  <nav class="topo-nav">
+    <a routerLink="/vitrine" class="btn-voltar">← Voltar para vitrine</a>
+    <div class="logo">
+      <span class="logo-text">Desapego</span>
+    </div>
+  </nav>
+
+  <div class="wrapper">
+    <div class="header">
+      <div>
+        <h2 class="titulo">Meus Anúncios</h2>
+        <p class="subtitulo">Gerencie os produtos que você está vendendo</p>
+      </div>
+      <button class="btn-novo" (click)="irParaCriar()">+ Novo anúncio</button>
+    </div>
+
+    @if (loading()) {
+      <div class="produtos-grid">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="skeleton-card"></div>
+        }
+      </div>
+    }
+
+    @if (erro() && !loading()) {
+      <div class="estado-vazio">
+        <p class="estado-msg">{{ erro() }}</p>
+        <button class="btn-novo" (click)="carregarMeusAnuncios()">Tentar novamente</button>
+      </div>
+    }
+
+    @if (!loading() && !erro() && produtos().length === 0) {
+      <div class="estado-vazio">
+        <h4 class="estado-titulo">Você ainda não tem anúncios</h4>
+        <p class="estado-msg">Que tal criar o primeiro agora?</p>
+        <button class="btn-novo" (click)="irParaCriar()">+ Criar anúncio</button>
+      </div>
+    }
+
+    @if (!loading() && produtos().length > 0) {
+      <div class="produtos-grid">
+        @for (produto of produtos(); track produto.id) {
+          <div class="produto-card">
+            <div class="produto-imagem" [style.background-color]="corPlaceholder(produto.id)">
+              @if (imagensDoProduto(produto).length > 0) {
+                <img [src]="imagemAtual(produto)" [alt]="produto.nome" class="produto-img" />
+
+                @if (imagensDoProduto(produto).length > 1) {
+                  <button
+                    class="carousel-btn prev"
+                    type="button"
+                    (click)="mudarImagem(produto, -1, $event)"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    class="carousel-btn next"
+                    type="button"
+                    (click)="mudarImagem(produto, 1, $event)"
+                  >
+                    ›
+                  </button>
+                  <span class="carousel-count">
+                    {{ indiceImagem(produto) + 1 }}/{{ imagensDoProduto(produto).length }}
+                  </span>
+                }
+              } @else {
+                <span class="produto-inicial">{{ inicialProduto(produto.nome) }}</span>
+              }
+            </div>
+            <div class="produto-info">
+              <p class="produto-nome">{{ produto.nome }}</p>
+              <p class="produto-preco">{{ formatarPreco(produto.preco) }}</p>
+              <p class="produto-descricao">{{ produto.descricao }}</p>
+
+              @if (produto.status === 'DISPONIVEL') {
+                <button class="btn-editar" (click)="abrirEdicao(produto, $event)">
+                  Editar anúncio
+                </button>
+              }
+              <button
+                class="btn-excluir"
+                (click)="excluirAnuncio(produto, $event)"
+                [disabled]="excluindoId() === produto.id"
+              >
+                {{ excluindoId() === produto.id ? 'Excluindo...' : 'Excluir anúncio' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+@if (produtoEditando()) {
+  <div class="modal-overlay" (click)="fecharEdicao()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-titulo">Editar anúncio</h3>
+        <button class="modal-fechar" (click)="fecharEdicao()">×</button>
+      </div>
+
+      @if (erroEdicao()) {
+        <div class="alert alert-danger mx-3 mt-2">{{ erroEdicao() }}</div>
+      }
+
+      <form [formGroup]="formEdicao" (ngSubmit)="salvarEdicao()" class="modal-form">
+        <div class="campo">
+          <label class="campo-label">Nome do produto</label>
+          <input
+            type="text"
+            class="campo-input"
+            formControlName="nome"
+            placeholder="Nome do produto"
+          />
+          @if (formEdicao.get('nome')?.invalid && formEdicao.get('nome')?.touched) {
+            <span class="campo-erro">Mínimo 3 caracteres.</span>
+          }
+        </div>
+
+        <div class="campo">
+          <label class="campo-label">Preço (R$)</label>
+          <div class="input-prefix">
+            <span class="prefix">R$</span>
+            <input
+              type="number"
+              class="campo-input"
+              formControlName="preco"
+              placeholder="0,00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+          @if (formEdicao.get('preco')?.invalid && formEdicao.get('preco')?.touched) {
+            <span class="campo-erro">Digite um preço válido.</span>
+          }
+        </div>
+
+        <div class="campo">
+          <label class="campo-label">Fotos do anúncio</label>
+          <label class="upload-area-edicao" for="inputImagemEdicao"> + Adicionar fotos </label>
+          <input
+            id="inputImagemEdicao"
+            type="file"
+            accept="image/*"
+            multiple
+            style="display: none"
+            (change)="onNovasImagensSelecionadas($event)"
+          />
+
+          @if (imagensEdicao().length > 0 || novasImagensPreview().length > 0) {
+            <div class="preview-grid-edicao">
+              @for (imagem of imagensEdicao(); track imagem; let i = $index) {
+                <div class="preview-item-edicao">
+                  <img [src]="imagem" alt="Foto atual do anúncio" />
+                  <button type="button" (click)="removerImagemExistente(i)">Remover</button>
+                </div>
+              }
+
+              @for (preview of novasImagensPreview(); track preview; let i = $index) {
+                <div class="preview-item-edicao nova">
+                  <img [src]="preview" alt="Nova foto do anúncio" />
+                  <button type="button" (click)="removerNovaImagem(i)">Remover</button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="campo">
+          <label class="campo-label">Descrição <span class="opcional">(opcional)</span></label>
+          <textarea
+            class="campo-input"
+            formControlName="descricao"
+            rows="3"
+            placeholder="Descreva o produto..."
+          ></textarea>
+          @if (formEdicao.get('descricao')?.invalid && formEdicao.get('descricao')?.touched) {
+            <span class="campo-erro">Se preencher, mínimo 10 caracteres.</span>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancelar" (click)="fecharEdicao()">Cancelar</button>
+          <button type="submit" class="btn-salvar" [disabled]="salvando()">
+            @if (salvando()) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,199 @@
+<div class="vitrine-wrapper">
+  <nav class="vitrine-navbar">
+    <div class="navbar-logo">
+      <span class="logo-text">Desapego</span>
+    </div>
+
+    <div class="navbar-actions">
+      @if (authService.isLoggedIn()) {
+        <button class="btn-sair" (click)="logout()" title="Sair">Sair</button>
+      } @else {
+        <a routerLink="/login" class="btn btn-outline-success rounded-pill px-3">Entrar</a>
+        <a routerLink="/cadastro" class="btn btn-success rounded-pill px-3">Cadastrar</a>
+      }
+    </div>
+  </nav>
+
+  <div class="vitrine-body">
+    <aside class="vitrine-sidebar">
+      <h3 class="sidebar-title">Marketplace</h3>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-item active" href="#">
+          <span>Explorar tudo</span>
+        </a>
+        @if (authService.isLoggedIn()) {
+          <a class="sidebar-item" routerLink="/chats">
+            <span>Mensagens</span>
+          </a>
+          <a class="sidebar-item" routerLink="/meus-anuncios">
+            <span>Meus anúncios</span>
+          </a>
+        }
+      </nav>
+
+      <div class="sidebar-divider"></div>
+
+      <button class="btn btn-success w-100 py-2 btn-criar" (click)="irParaVender()">
+        + Criar novo anúncio
+      </button>
+    </aside>
+
+    <main class="vitrine-main">
+      <div class="main-header">
+        <h2 class="main-title">Produtos em destaque</h2>
+        <button (click)="carregarProdutos()" class="btn btn-light px-3 py-2 btn-atualizar">
+          Atualizar
+        </button>
+      </div>
+
+      @if (loading()) {
+        <div class="produtos-grid">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="skeleton-card"></div>
+          }
+        </div>
+      }
+
+      @if (erro() && !loading()) {
+        <div class="text-center py-5">
+          <p class="mt-2 text-secondary">{{ erro() }}</p>
+          <button class="btn btn-success btn-sm mt-2" (click)="carregarProdutos()">
+            Tentar novamente
+          </button>
+        </div>
+      }
+
+      @if (!loading() && !erro() && produtos().length === 0) {
+        <div class="estado-vazio">
+          <h4 class="mt-2">Nenhum produto ainda</h4>
+          <p class="text-secondary small">Seja o primeiro a anunciar!</p>
+        </div>
+      }
+
+      @if (!loading() && produtos().length > 0) {
+        <div class="produtos-grid">
+          @for (produto of produtos(); track produto.id) {
+            <div class="produto-card" (click)="abrirProduto(produto)">
+              @if (imagensDoProduto(produto).length > 0) {
+                <div class="card-thumb">
+                  <img [src]="imagemAtual(produto)" [alt]="produto.nome" class="card-img" />
+
+                  @if (imagensDoProduto(produto).length > 1) {
+                    <button
+                      class="carousel-btn prev"
+                      type="button"
+                      (click)="mudarImagem(produto, -1, $event)"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      class="carousel-btn next"
+                      type="button"
+                      (click)="mudarImagem(produto, 1, $event)"
+                    >
+                      ›
+                    </button>
+                    <span class="carousel-count">
+                      {{ indiceImagem(produto) + 1 }}/{{ imagensDoProduto(produto).length }}
+                    </span>
+                  }
+                </div>
+              } @else {
+                <div class="card-thumb" [style.background-color]="corPlaceholder(produto.id)">
+                  <span class="card-inicial">{{ inicialProduto(produto.nome) }}</span>
+                </div>
+              }
+
+              <div class="card-body-custom">
+                <p class="card-preco">{{ formatarPreco(produto.preco) }}</p>
+                <p class="card-nome">{{ produto.nome }}</p>
+                <p class="card-vendedor">@{{ produto.vendedor.nick || 'anônimo' }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+
+  @if (produtoSelecionado()) {
+    <div class="modal-overlay" (click)="fecharModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button class="modal-fechar" (click)="fecharModal()">×</button>
+
+        @if (imagensDoProduto(produtoSelecionado()).length > 0) {
+          <div class="modal-thumb">
+            <img
+              [src]="imagemAtual(produtoSelecionado())"
+              [alt]="produtoSelecionado()?.nome"
+              class="modal-img"
+            />
+
+            @if (imagensDoProduto(produtoSelecionado()).length > 1) {
+              <button
+                class="carousel-btn prev"
+                type="button"
+                (click)="mudarImagem(produtoSelecionado()!, -1, $event)"
+              >
+                ‹
+              </button>
+              <button
+                class="carousel-btn next"
+                type="button"
+                (click)="mudarImagem(produtoSelecionado()!, 1, $event)"
+              >
+                ›
+              </button>
+              <span class="carousel-count">
+                {{ indiceImagem(produtoSelecionado()!) + 1 }}/{{
+                  imagensDoProduto(produtoSelecionado()).length
+                }}
+              </span>
+            }
+          </div>
+        } @else {
+          <div
+            class="modal-thumb"
+            [style.background-color]="corPlaceholder(produtoSelecionado()?.id || 0)"
+          >
+            <span class="modal-inicial">{{ inicialProduto(produtoSelecionado()?.nome) }}</span>
+          </div>
+        }
+
+        <div class="modal-body">
+          <p class="modal-preco">{{ formatarPreco(produtoSelecionado()?.preco || 0) }}</p>
+          <h3 class="modal-nome">{{ produtoSelecionado()?.nome }}</h3>
+
+          @if (produtoSelecionado()?.descricao) {
+            <p class="modal-desc">{{ produtoSelecionado()?.descricao }}</p>
+          }
+
+          <div class="modal-vendedor">
+            <div>
+              <p class="modal-vendedor-nome">
+                {{ produtoSelecionado()?.vendedor?.nome || 'Usuário' }}
+              </p>
+              <p class="modal-vendedor-nick">
+                @{{ produtoSelecionado()?.vendedor?.nick || 'vendedor' }}
+              </p>
+            </div>
+          </div>
+
+          @if (erroContato()) {
+            <p class="modal-erro">{{ erroContato() }}</p>
+          }
+
+          <button
+            class="btn-contato"
+            type="button"
+            [disabled]="abrindoChat()"
+            (click)="entrarEmContato(produtoSelecionado())"
+          >
+            {{ abrindoChat() ? 'Abrindo conversa...' : 'Entrar em contato' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

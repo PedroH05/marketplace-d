@@ -1,0 +1,78 @@
+<div class="login-wrapper">
+  <div class="login-brand">
+    <div class="brand-content">
+      <div class="brand-logo">D</div>
+      <h1 class="brand-title">Desapego</h1>
+      <p class="brand-subtitle">Compre e venda com facilidade.<br />Milhares de produtos esperando por você.</p>
+    </div>
+  </div>
+
+  <div class="login-form-side">
+    <div class="login-card">
+      <h2 class="login-title">Entrar</h2>
+      <p class="login-subtitle">Bem-vindo de volta!</p>
+
+      @if (erro()) {
+        <div class="alert alert-danger" role="alert">
+          {{ erro() }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">E-mail</label>
+          <input
+            type="email"
+            class="form-control form-control-lg"
+            [class.is-invalid]="emailInvalido"
+            formControlName="email"
+            placeholder="seu@email.com"
+            autocomplete="email"
+          />
+          @if (emailInvalido) {
+            <div class="invalid-feedback">Digite um e-mail válido.</div>
+          }
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Senha</label>
+          <div class="input-group">
+            <input
+              [type]="mostrarSenha() ? 'text' : 'password'"
+              class="form-control form-control-lg"
+              [class.is-invalid]="senhaInvalida"
+              formControlName="senha"
+              placeholder="Sua senha"
+              autocomplete="current-password"
+            />
+            <button class="btn btn-outline-secondary" type="button" (click)="toggleSenha()">
+              {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
+            </button>
+            @if (senhaInvalida) {
+              <div class="invalid-feedback">A senha deve ter no mínimo 6 caracteres.</div>
+            }
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg w-100" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+          }
+          {{ loading() ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+
+      <hr class="my-4" />
+
+      <div class="text-center">
+        <p class="mb-0 text-secondary">
+          Não tem conta?
+          <a routerLink="/cadastro" class="link-success fw-semibold text-decoration-none">Cadastre-se grátis</a>
+        </p>
+        <a routerLink="/vitrine" class="d-block mt-2 text-secondary text-decoration-none small">
+          ← Voltar para a vitrine
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

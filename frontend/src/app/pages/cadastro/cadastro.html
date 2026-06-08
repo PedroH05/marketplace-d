@@ -1,0 +1,102 @@
+<div class="cadastro-wrapper">
+  <div class="container">
+    <div class="card">
+      <div class="text-center mb-4">
+        <span class="cadastro-marca">Desapego</span>
+        <h2 class="mt-3 cadastro-titulo">Criar conta</h2>
+        <p class="text-secondary">Cadastre-se para começar a desapegar e comprar itens.</p>
+      </div>
+
+      @if (erro()) {
+        <div class="alert alert-danger" role="alert">
+          {{ erro() }}
+        </div>
+      }
+
+      @if (sucesso()) {
+        <div class="alert alert-success" role="alert">
+          Conta criada com sucesso! Redirecionando para o login...
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label">Nome completo</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="nomeInvalido"
+            formControlName="nome"
+            placeholder="Seu nome"
+          />
+          @if (nomeInvalido) {
+            <div class="invalid-feedback">Digite seu nome completo com pelo menos 3 letras.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Nome de usuário</label>
+          <div class="input-group">
+            <span class="input-group-text">&#64;</span>
+            <input
+              type="text"
+              class="form-control input-nick"
+              [class.is-invalid]="nickInvalido"
+              formControlName="nick"
+              placeholder="ex: joao_silva"
+            />
+            @if (nickInvalido) {
+              <div class="invalid-feedback">Use pelo menos 3 caracteres com letras, números ou _.</div>
+            }
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">E-mail</label>
+          <input
+            type="email"
+            class="form-control"
+            [class.is-invalid]="emailInvalido"
+            formControlName="email"
+            placeholder="seu@email.com"
+          />
+          @if (emailInvalido) {
+            <div class="invalid-feedback">Digite um endereço de e-mail válido.</div>
+          }
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Senha</label>
+          <input
+            type="password"
+            class="form-control"
+            [class.is-invalid]="senhaInvalida"
+            formControlName="senha"
+            placeholder="Mínimo 6 caracteres"
+          />
+          @if (senhaInvalida) {
+            <div class="invalid-feedback">A senha deve ter no mínimo 6 caracteres.</div>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 py-2" [disabled]="loading() || sucesso()">
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Criando sua conta...
+          } @else {
+            Cadastrar gratuitamente
+          }
+        </button>
+      </form>
+
+      <hr class="my-4" />
+
+      <div class="text-center">
+        <p class="mb-0 text-secondary">
+          Já tem uma conta?
+          <a routerLink="/login" class="link-success fw-semibold text-decoration-none">Entrar</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

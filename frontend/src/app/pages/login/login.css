@@ -1,0 +1,135 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+.login-wrapper {
+  background-color: #f0f2f5;
+  display: flex;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+}
+
+.login-brand {
+  align-items: center;
+  background: linear-gradient(135deg, #1a7a3c 0%, #155f30 100%);
+  color: #ffffff;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.brand-content {
+  max-width: 420px;
+}
+
+.brand-logo {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  display: inline-flex;
+  font-size: 2rem;
+  font-weight: 800;
+  height: 72px;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 72px;
+}
+
+.brand-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.brand-subtitle {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.login-form-side {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e4e6ea !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08) !important;
+  max-width: 440px;
+  padding: 3rem !important;
+  width: 100%;
+}
+
+.login-title {
+  color: #1c1e21;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+  color: #65676b;
+  margin-bottom: 2rem;
+}
+
+.login-card .form-control {
+  background-color: #f5f6f7 !important;
+  border: 1px solid #ccd0d5 !important;
+  border-radius: 8px !important;
+  color: #1c1e21 !important;
+  font-size: 1rem !important;
+  padding: 0.7rem 1rem !important;
+}
+
+.login-card .form-control:focus {
+  background-color: #ffffff !important;
+  border-color: #1a7a3c !important;
+  box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.15) !important;
+  outline: 0;
+}
+
+.login-card .form-label {
+  color: #65676b !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+}
+
+.login-card .btn-outline-secondary {
+  background-color: #e4e6ea !important;
+  border: 1px solid #ccd0d5 !important;
+  border-radius: 0 8px 8px 0 !important;
+  color: #1c1e21 !important;
+  font-weight: 700;
+  min-width: 92px;
+}
+
+.login-card .btn-success {
+  background-color: #1a7a3c !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  padding: 0.75rem !important;
+}
+
+.login-card .btn-success:hover {
+  background-color: #155f30 !important;
+}
+
+.login-card a {
+  color: #1a7a3c !important;
+}
+
+@media (max-width: 992px) {
+  .login-brand {
+    display: none;
+  }
+}

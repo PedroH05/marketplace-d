@@ -1,0 +1,136 @@
+<div class="vender-wrapper">
+  <nav class="vender-navbar">
+    <a routerLink="/vitrine" class="navbar-back">← Voltar para vitrine</a>
+    <div class="navbar-logo">
+      <span class="logo-text">Desapego</span>
+    </div>
+  </nav>
+
+  <div class="vender-container">
+    @if (sucesso()) {
+      <div class="sucesso-card">
+        <h2>Anúncio publicado!</h2>
+        <p>Seu produto já está na vitrine. Redirecionando...</p>
+        <div class="spinner-border text-success mt-3" role="status"></div>
+      </div>
+    }
+
+    @if (!sucesso()) {
+      <div class="vender-card">
+        <div class="vender-header">
+          <div>
+            <h2 class="vender-title">Criar novo anúncio</h2>
+            <p class="vender-subtitle">Preencha os dados do produto que deseja vender</p>
+          </div>
+        </div>
+
+        @if (erro()) {
+          <div class="alert alert-danger">
+            {{ erro() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Fotos do produto</label>
+
+            <label class="upload-area" for="inputImagem">
+              <span class="upload-icone">+</span>
+              <span class="upload-texto">Adicionar fotos</span>
+              <span class="upload-subtexto">JPG, PNG ou WEBP - máximo 8 fotos de 10MB</span>
+            </label>
+            <input
+              id="inputImagem"
+              type="file"
+              accept="image/*"
+              multiple
+              style="display: none"
+              (change)="onImagemSelecionada($event)"
+            />
+
+            @if (imagemPreviews().length > 0) {
+              <div class="preview-grid">
+                @for (preview of imagemPreviews(); track preview; let i = $index) {
+                  <div class="preview-item">
+                    <img [src]="preview" alt="Preview da foto" class="preview-img" />
+                    <button type="button" class="btn-remover-imagem" (click)="removerImagem(i)">
+                      Remover
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Nome do produto <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              [class.is-invalid]="nomeInvalido"
+              formControlName="nome"
+              placeholder="Ex: iPhone 13 128GB Preto"
+              maxlength="100"
+            />
+            @if (nomeInvalido) {
+              <div class="invalid-feedback">O nome deve ter pelo menos 3 caracteres.</div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Preço (R$) <span class="text-danger">*</span>
+            </label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text">R$</span>
+              <input
+                type="number"
+                class="form-control"
+                [class.is-invalid]="precoInvalido"
+                formControlName="preco"
+                placeholder="0,00"
+                min="0"
+                step="0.01"
+              />
+              @if (precoInvalido) {
+                <div class="invalid-feedback">Digite um preço válido.</div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Descrição <span class="text-danger">*</span>
+            </label>
+            <textarea
+              class="form-control"
+              [class.is-invalid]="descricaoInvalida"
+              formControlName="descricao"
+              rows="4"
+              placeholder="Descreva o estado do produto, características, motivo da venda..."
+              maxlength="500"
+            ></textarea>
+            @if (descricaoInvalida) {
+              <div class="invalid-feedback">A descrição é obrigatória.</div>
+            }
+            <small class="text-secondary mt-1 d-block">
+              {{ form.get('descricao')?.value?.length || 0 }}/500 caracteres
+            </small>
+          </div>
+
+          <div class="vender-actions">
+            <a routerLink="/vitrine" class="btn btn-outline-secondary btn-lg">Cancelar</a>
+            <button type="submit" class="btn btn-success btn-lg" [disabled]="loading()">
+              @if (loading()) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              {{ loading() ? 'Publicando...' : 'Publicar anúncio' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</div>

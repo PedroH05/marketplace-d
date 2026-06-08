@@ -1,0 +1,75 @@
+<div class="chat-page">
+  <nav class="chat-nav">
+    <a routerLink="/chats" class="nav-link">Conversas</a>
+    <a routerLink="/vitrine" class="nav-link secundaria">Vitrine</a>
+  </nav>
+
+  <main class="chat-shell">
+    <header class="chat-header">
+      @if (resumo()) {
+        <div class="produto-thumb">
+          @if (resumo()?.produtoImagemUrl) {
+            <img [src]="resumo()?.produtoImagemUrl" [alt]="resumo()?.produtoNome" />
+          } @else {
+            <span>{{ inicial(resumo()?.produtoNome) }}</span>
+          }
+        </div>
+
+        <div class="chat-titulos">
+          <h1>{{ resumo()?.produtoNome }}</h1>
+          <p>@{{ resumo()?.outroUsuarioNick || 'usuario' }}</p>
+        </div>
+      } @else {
+        <div class="chat-titulos">
+          <h1>Conversa</h1>
+          <p>Carregando...</p>
+        </div>
+      }
+    </header>
+
+    @if (erro()) {
+      <div class="alerta">{{ erro() }}</div>
+    }
+
+    <section #mensagensContainer class="mensagens">
+      @if (loading()) {
+        <div class="mensagem-status">Carregando mensagens...</div>
+      }
+
+      @if (!loading() && mensagens().length === 0) {
+        <div class="mensagem-status">Envie a primeira mensagem.</div>
+      }
+
+      @if (!loading() && mensagens().length > 0) {
+        @for (mensagem of mensagens(); track mensagem.id) {
+          <div class="mensagem-linha" [class.minha]="ehMinhaMensagem(mensagem)">
+            <div class="mensagem-bolha">
+              <p>{{ mensagem.mensagem }}</p>
+              <span>{{ formatarHora(mensagem.dataEnvio) }}</span>
+            </div>
+          </div>
+        }
+      }
+    </section>
+
+    <footer class="composer">
+      <form (submit)="$event.preventDefault(); enviarMensagem(mensagemInput.value)">
+        <input
+          #mensagemInput
+          id="mensagem-chat"
+          name="mensagem"
+          type="text"
+          [formControl]="mensagemControl"
+          aria-label="Mensagem"
+          autocomplete="off"
+          (keydown.enter)="$event.preventDefault(); enviarMensagem(mensagemInput.value)"
+          maxlength="1000"
+          placeholder="Mensagem"
+        />
+        <button type="button" [disabled]="enviando()" (click)="enviarMensagem(mensagemInput.value)">
+          {{ enviando() ? 'Enviando...' : 'Enviar' }}
+        </button>
+      </form>
+    </footer>
+  </main>
+</div>

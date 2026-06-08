@@ -1,0 +1,86 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+.cadastro-wrapper {
+  align-items: center;
+  background-color: #f0f2f5 !important;
+  color: #1c1e21 !important;
+  display: flex;
+  font-family: 'DM Sans', sans-serif;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.cadastro-wrapper .container {
+  max-width: 520px !important;
+  width: 100%;
+}
+
+.cadastro-wrapper .card {
+  background-color: #ffffff !important;
+  border: 1px solid #e4e6ea !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: 2.5rem !important;
+}
+
+.cadastro-marca {
+  color: #1a7a3c;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.cadastro-titulo {
+  color: #1c1e21;
+  font-weight: 800;
+}
+
+.cadastro-wrapper .form-control {
+  background-color: #f5f6f7 !important;
+  border: 1px solid #ccd0d5 !important;
+  border-radius: 8px !important;
+  color: #1c1e21 !important;
+  font-size: 0.95rem !important;
+  padding: 0.6rem 1rem !important;
+}
+
+.cadastro-wrapper .form-control:focus {
+  background-color: #ffffff !important;
+  border-color: #1a7a3c !important;
+  box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.15) !important;
+  outline: 0;
+}
+
+.cadastro-wrapper .form-label {
+  color: #65676b !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+}
+
+.cadastro-wrapper .btn-success {
+  background-color: #1a7a3c !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+}
+
+.cadastro-wrapper .btn-success:hover {
+  background-color: #155f30 !important;
+}
+
+.cadastro-wrapper .input-group-text {
+  background-color: #e4e6ea !important;
+  border: 1px solid #ccd0d5 !important;
+  border-radius: 8px 0 0 8px !important;
+  color: #65676b !important;
+  font-weight: 700;
+}
+
+.cadastro-wrapper .input-group .input-nick {
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.cadastro-wrapper a {
+  color: #1a7a3c !important;
+}

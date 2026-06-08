@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.chats-page {
+  min-height: 100vh;
+  background: #f0f2f4;
+  color: #111827;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.chats-nav {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.nav-link {
+  color: #25693d;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logo-text {
+  color: #1a7a3c;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.chats-main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.chats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.chats-header h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.chats-header p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0.2rem 0 0;
+}
+
+.btn-atualizar,
+.btn-explorar {
+  border: none;
+  border-radius: 8px;
+  background: #25693d;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+}
+
+.lista-conversas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chat-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+
+.chat-item:hover {
+  border-color: #b8d8c4;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08);
+  transform: translateY(-1px);
+}
+
+.produto-thumb {
+  align-items: center;
+  aspect-ratio: 1;
+  background: #e8f5e9;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.produto-thumb img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.produto-thumb span {
+  color: #25693d;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.chat-info {
+  min-width: 0;
+}
+
+.chat-topo {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.chat-topo strong {
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-topo span,
+.chat-usuario {
+  color: #6b7280;
+  font-size: 0.78rem;
+}
+
+.chat-usuario,
+.chat-preview {
+  margin: 0.15rem 0 0;
+}
+
+.chat-preview {
+  color: #374151;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-remover {
+  align-self: center;
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.55rem 0.8rem;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.btn-remover:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.btn-remover:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.estado-vazio {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.estado-vazio h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.estado-vazio p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.chat-skeleton {
+  animation: shimmer 1.3s infinite;
+  background: linear-gradient(90deg, #f5f5f5 25%, #e5e7eb 50%, #f5f5f5 75%);
+  background-size: 200% 100%;
+  border-radius: 8px;
+  height: 96px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .chats-nav,
+  .chats-header {
+    align-items: flex-start;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .chats-nav {
+    gap: 0.45rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .chat-item {
+    grid-template-columns: 62px 1fr;
+  }
+
+  .btn-remover {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

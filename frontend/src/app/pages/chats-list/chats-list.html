@@ -1,0 +1,73 @@
+<div class="chats-page">
+  <nav class="chats-nav">
+    <a routerLink="/vitrine" class="nav-link">← Voltar para vitrine</a>
+    <span class="logo-text">Desapego</span>
+  </nav>
+
+  <main class="chats-main">
+    <div class="chats-header">
+      <div>
+        <h1>Conversas</h1>
+        <p>Mensagens recentes</p>
+      </div>
+      <button class="btn-atualizar" type="button" (click)="carregarChats()">Atualizar</button>
+    </div>
+
+    @if (loading()) {
+      <div class="lista-conversas">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="chat-skeleton"></div>
+        }
+      </div>
+    }
+
+    @if (erro() && !loading()) {
+      <div class="estado-vazio">
+        <p>{{ erro() }}</p>
+        <button class="btn-atualizar" type="button" (click)="carregarChats()">Tentar novamente</button>
+      </div>
+    }
+
+    @if (!loading() && !erro() && chats().length === 0) {
+      <div class="estado-vazio">
+        <h2>Nenhuma conversa ainda</h2>
+        <a routerLink="/vitrine" class="btn-explorar">Explorar produtos</a>
+      </div>
+    }
+
+    @if (!loading() && !erro() && chats().length > 0) {
+      <div class="lista-conversas">
+        @for (chat of chats(); track chat.id) {
+          <div class="chat-item" role="button" tabindex="0" (click)="abrirChat(chat)" (keydown.enter)="abrirChat(chat)">
+            <div class="produto-thumb">
+              @if (chat.produtoImagemUrl) {
+                <img [src]="chat.produtoImagemUrl" [alt]="chat.produtoNome" />
+              } @else {
+                <span>{{ inicial(chat.produtoNome) }}</span>
+              }
+            </div>
+
+            <div class="chat-info">
+              <div class="chat-topo">
+                <strong>{{ chat.produtoNome }}</strong>
+                <span>{{ formatarData(chat.dataUltimaMensagem) }}</span>
+              </div>
+              <p class="chat-usuario">@{{ chat.outroUsuarioNick || 'usuario' }}</p>
+              <p class="chat-preview">{{ ultimaMensagem(chat) }}</p>
+            </div>
+
+            <button
+              class="btn-remover"
+              type="button"
+              title="Remover conversa"
+              [disabled]="removendoId() === chat.id"
+              (click)="removerChat(chat, $event)"
+            >
+              {{ removendoId() === chat.id ? 'Removendo...' : 'Remover' }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>
