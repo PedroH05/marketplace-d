@@ -26,6 +26,7 @@ export class VitrineComponent implements OnInit {
   indicesImagem = signal<Record<number, number>>({});
   meusProdutoIds = signal<Set<number>>(new Set());
   abrindoChat = signal<boolean>(false);
+  excluindoProdutoId = signal<number | null>(null);
   erroContato = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -164,6 +165,28 @@ export class VitrineComponent implements OnInit {
     if (this.ehMeuProduto(produto)) return 'Ver meus anúncios';
     if (this.abrindoChat()) return 'Abrindo conversa...';
     return 'Entrar em contato';
+  }
+
+  excluirProdutoComoAdmin(produto: Produto | null): void {
+    if (!produto || !this.authService.isAdmin() || this.excluindoProdutoId()) return;
+
+    const confirmar = confirm(`Deseja excluir o anúncio "${produto.nome}"?`);
+    if (!confirmar) return;
+
+    this.excluindoProdutoId.set(produto.id);
+    this.erroContato.set(null);
+
+    this.produtoService.excluirProduto(produto.id).subscribe({
+      next: () => {
+        this.produtos.update((produtos) => produtos.filter((item) => item.id !== produto.id));
+        this.excluindoProdutoId.set(null);
+        this.fecharModal();
+      },
+      error: (err) => {
+        this.excluindoProdutoId.set(null);
+        this.erroContato.set(err.error?.erro || 'Não foi possível excluir este anúncio.');
+      },
+    });
   }
 
   private carregarMeusProdutoIds(): void {

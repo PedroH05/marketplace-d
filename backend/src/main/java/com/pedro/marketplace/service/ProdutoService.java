@@ -9,22 +9,29 @@ import com.pedro.marketplace.exception.EstadoInvalidoException;
 import com.pedro.marketplace.exception.RecursoNaoEncontradoException;
 import com.pedro.marketplace.repository.ProdutoRepository;
 import com.pedro.marketplace.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final List<String> adminEmails;
 
-    public ProdutoService(ProdutoRepository produtoRepository, UsuarioRepository usuarioRepository) {
+    public ProdutoService(ProdutoRepository produtoRepository,
+                          UsuarioRepository usuarioRepository,
+                          @Value("${app.admin.emails:}") String adminEmails) {
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.adminEmails = normalizarAdminEmails(adminEmails);
     }
 
     @Transactional
@@ -74,6 +81,8 @@ public class ProdutoService {
     @Transactional
     public Produto atualizar(Long id, ProdutoRequestDTO dto) {
         Produto produto = buscarPorId(id);
+        validarDonoDoProduto(produto);
+
         produto.setNome(dto.nome());
         produto.setPreco(dto.preco());
         produto.setDescricao(dto.descricao());
@@ -88,6 +97,7 @@ public class ProdutoService {
     @Transactional
     public ProdutoResponseDTO venderProduto(Long id) {
         Produto produto = buscarPorId(id);
+        validarDonoDoProduto(produto);
 
         if (produto.getStatus() == StatusProduto.VENDIDO) {
             throw new EstadoInvalidoException("Este produto já foi vendido!");
@@ -99,11 +109,13 @@ public class ProdutoService {
 
     @Transactional
     public void excluir(Long id) {
+        Produto produto = buscarPorId(id);
+        validarDonoOuAdmin(produto);
         if (!produtoRepository.existsById(id)) {
             throw new RecursoNaoEncontradoException("Produto não encontrado!");
         }
 
-        produtoRepository.deleteById(id);
+        produtoRepository.delete(produto);
     }
 
     public List<ProdutoResponseDTO> listarProdutosDoVendedorPorEmail(String email) {
@@ -135,5 +147,47 @@ public class ProdutoService {
         }
 
         return imagens;
+    }
+
+    private String emailUsuarioAutenticado() {
+        return SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+    }
+
+    private void validarDonoDoProduto(Produto produto) {
+        String email = emailUsuarioAutenticado();
+        if (!produto.getVendedor().getEmail().equalsIgnoreCase(email)) {
+            throw new AccessDeniedException("Você só pode alterar seus próprios anúncios.");
+        }
+    }
+
+    private void validarDonoOuAdmin(Produto produto) {
+        String email = emailUsuarioAutenticado();
+        boolean dono = produto.getVendedor().getEmail().equalsIgnoreCase(email);
+
+        if (!dono && !ehAdmin(email)) {
+            throw new AccessDeniedException("Você não tem permissão para excluir este anúncio.");
+        }
+    }
+
+    private boolean ehAdmin(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+
+        return adminEmails.contains(email.trim().toLowerCase(Locale.ROOT));
+    }
+
+    private List<String> normalizarAdminEmails(String emails) {
+        if (emails == null || emails.isBlank()) {
+            return List.of();
+        }
+
+        return List.of(emails.split(","))
+                .stream()
+                .map(email -> email.trim().toLowerCase(Locale.ROOT))
+                .filter(email -> !email.isBlank())
+                .toList();
     }
 }

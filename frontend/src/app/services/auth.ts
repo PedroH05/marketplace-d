@@ -49,4 +49,11 @@ export class AuthService {
       return null;
     }
   }
+
+  isAdmin(): boolean {
+    const email = this.getUsuarioEmail();
+    if (!email) return false;
+
+    return environment.adminEmails.includes(email.trim().toLowerCase());
+  }
 }

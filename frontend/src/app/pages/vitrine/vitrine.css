@@ -481,6 +481,35 @@
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+.btn-excluir-admin {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #dc2626;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-top: 0.75rem;
+  padding: 0.72rem;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+  width: 100%;
+}
+
+.btn-excluir-admin:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.btn-excluir-admin:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
 .modal-erro {
   background: #fff4f4;
   border: 1px solid #ffd6d6;

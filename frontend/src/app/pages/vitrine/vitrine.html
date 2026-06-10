@@ -204,6 +204,21 @@
           >
             {{ textoBotaoContato(produtoSelecionado()) }}
           </button>
+
+          @if (authService.isAdmin()) {
+            <button
+              class="btn-excluir-admin"
+              type="button"
+              [disabled]="excluindoProdutoId() === produtoSelecionado()?.id"
+              (click)="excluirProdutoComoAdmin(produtoSelecionado())"
+            >
+              {{
+                excluindoProdutoId() === produtoSelecionado()?.id
+                  ? 'Excluindo...'
+                  : 'Excluir anúncio'
+              }}
+            </button>
+          }
         </div>
       </div>
     </div>
