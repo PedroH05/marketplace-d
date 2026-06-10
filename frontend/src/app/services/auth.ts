@@ -27,7 +27,15 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token_desapego');
+    const token = this.getToken();
+    if (!token) return false;
+
+    if (this.tokenExpirado(token)) {
+      this.logout();
+      return false;
+    }
+
+    return true;
   }
 
   getToken(): string | null {
@@ -40,10 +48,13 @@ export class AuthService {
 
   getUsuarioEmail(): string | null {
     const token = this.getToken();
-    if (!token) return null;
+    if (!token || this.tokenExpirado(token)) {
+      this.logout();
+      return null;
+    }
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = this.payloadToken(token);
       return payload.sub ?? null;
     } catch {
       return null;
@@ -55,5 +66,26 @@ export class AuthService {
     if (!email) return false;
 
     return environment.adminEmails.includes(email.trim().toLowerCase());
+  }
+
+  private tokenExpirado(token: string): boolean {
+    try {
+      const payload = this.payloadToken(token);
+      if (!payload.exp) return false;
+
+      return Date.now() >= payload.exp * 1000;
+    } catch {
+      return true;
+    }
+  }
+
+  private payloadToken(token: string): any {
+    const payloadBase64 = token.split('.')[1];
+    const payloadNormalizado = payloadBase64
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(Math.ceil(payloadBase64.length / 4) * 4, '=');
+
+    return JSON.parse(atob(payloadNormalizado));
   }
 }

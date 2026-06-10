@@ -11,6 +11,8 @@ import com.pedro.marketplace.repository.ProdutoRepository;
 import com.pedro.marketplace.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,9 +152,23 @@ public class ProdutoService {
     }
 
     private String emailUsuarioAutenticado() {
-        return SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Usuário não autenticado.");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof Usuario usuario) {
+            return usuario.getEmail();
+        }
+
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getUsername();
+        }
+
+        return authentication.getName();
     }
 
     private void validarDonoDoProduto(Produto produto) {
