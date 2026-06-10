@@ -173,6 +173,12 @@ export class VitrineComponent implements OnInit {
   excluirProdutoComoAdmin(produto: Produto | null): void {
     if (!produto || !this.admin() || this.excluindoProdutoId()) return;
 
+    if (!this.authService.isLoggedIn()) {
+      this.admin.set(false);
+      this.erroContato.set('Sua sessao expirou. Entre novamente para excluir anuncios.');
+      return;
+    }
+
     const confirmar = confirm(`Deseja excluir o anúncio "${produto.nome}"?`);
     if (!confirmar) return;
 
@@ -187,6 +193,19 @@ export class VitrineComponent implements OnInit {
       },
       error: (err) => {
         this.excluindoProdutoId.set(null);
+        console.error('Erro ao excluir produto como admin:', err);
+
+        if (err.status === 401 || err.status === 403) {
+          this.carregarPerfilAdmin();
+          const email = this.authService.getUsuarioEmail();
+          this.erroContato.set(
+            email
+              ? `A conta ${email} nao tem permissao para excluir este anuncio.`
+              : 'Sua sessao expirou. Entre novamente para excluir anuncios.',
+          );
+          return;
+        }
+
         this.erroContato.set(err.error?.erro || 'Não foi possível excluir este anúncio.');
       },
     });
