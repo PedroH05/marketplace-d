@@ -36,6 +36,7 @@ export class MeusAnunciosComponent implements OnInit {
   produtos = signal<Produto[]>([]);
   loading = signal<boolean>(true);
   erro = signal<string | null>(null);
+  erroAcao = signal<string | null>(null);
 
   produtoEditando = signal<Produto | null>(null);
   salvando = signal<boolean>(false);
@@ -66,6 +67,7 @@ export class MeusAnunciosComponent implements OnInit {
 
     this.loading.set(true);
     this.erro.set(null);
+    this.erroAcao.set(null);
 
     this.produtoService.listarPorVendedor(email).subscribe({
       next: (lista) => {
@@ -208,7 +210,7 @@ export class MeusAnunciosComponent implements OnInit {
     if (!confirmar) return;
 
     this.excluindoId.set(produto.id);
-    this.erro.set(null);
+    this.erroAcao.set(null);
 
     this.produtoService.excluirProduto(produto.id).subscribe({
       next: () => {
@@ -217,7 +219,12 @@ export class MeusAnunciosComponent implements OnInit {
       },
       error: (err) => {
         this.excluindoId.set(null);
-        this.erro.set(err.error?.erro || 'Não foi possível excluir o anúncio.');
+        if (err.status === 401 || err.status === 403) {
+          this.erroAcao.set('Sua sessão expirou. Saia e entre novamente para excluir o anúncio.');
+          return;
+        }
+
+        this.erroAcao.set(err.error?.erro || 'Não foi possível excluir o anúncio.');
       },
     });
   }

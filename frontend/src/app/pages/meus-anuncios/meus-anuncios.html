@@ -15,6 +15,12 @@
       <button class="btn-novo" (click)="irParaCriar()">+ Novo anúncio</button>
     </div>
 
+    @if (erroAcao()) {
+      <div class="alerta-acao">
+        <span>{{ erroAcao() }}</span>
+      </div>
+    }
+
     @if (loading()) {
       <div class="produtos-grid">
         @for (i of [1, 2, 3, 4]; track i) {

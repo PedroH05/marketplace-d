@@ -238,6 +238,21 @@
   font-size: 0.95rem;
 }
 
+.alerta-acao {
+  align-items: center;
+  background: #fff4f4;
+  border: 1px solid #ffd6d6;
+  border-radius: 10px;
+  color: #9f1239;
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: 600;
+  justify-content: center;
+  margin: -0.75rem 0 1.5rem;
+  padding: 0.85rem 1rem;
+  text-align: center;
+}
+
 /* SKELETON */
 .skeleton-card {
   height: 280px;
@@ -256,17 +271,72 @@
 }
 
 /* RESPONSIVO */
-@media (max-width: 480px) {
-  .wrapper {
-    padding: 1.5rem;
+@media (max-width: 640px) {
+  .topo-nav {
+    padding: 0.9rem 1rem;
   }
+
+  .btn-voltar {
+    font-size: 0.9rem;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+
+  .wrapper {
+    padding: 1.25rem 1rem 2rem;
+  }
+
   .header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.95rem;
+    margin-bottom: 1.35rem;
+    padding-bottom: 1rem;
   }
+
+  .titulo {
+    font-size: 1.45rem;
+  }
+
+  .subtitulo {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .header .btn-novo {
+    align-self: stretch;
+    padding: 0.72rem 1rem;
+  }
+
   .produtos-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .produto-imagem {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+
+  .produto-info {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .estado-vazio {
+    min-height: 45vh;
+    justify-content: center;
+    padding: 2rem 0.75rem;
+  }
+
+  .estado-vazio .btn-novo {
+    display: none;
+  }
+
+  .alerta-acao {
+    margin: -0.4rem 0 1rem;
+    padding: 0.75rem 0.85rem;
   }
 }
 
