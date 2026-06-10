@@ -36,6 +36,11 @@ public class SecurityConfig {
                     req.requestMatchers("/api/auth/**").permitAll();
                     req.requestMatchers("/ws-desapego", "/ws-desapego/**").permitAll();
                     req.requestMatchers(
+                            org.springframework.http.HttpMethod.DELETE,
+                            "/produtos/**",
+                            "/api/produtos/**"
+                    ).permitAll();
+                    req.requestMatchers(
                             org.springframework.http.HttpMethod.GET,
                             "/produtos",
                             "/produtos/**",

@@ -182,6 +182,25 @@ export class VitrineComponent implements OnInit {
     const confirmar = confirm(`Deseja excluir o anúncio "${produto.nome}"?`);
     if (!confirmar) return;
 
+    this.authService.buscarUsuarioLogado().subscribe({
+      next: (usuario) => {
+        if (!usuario.admin) {
+          this.admin.set(false);
+          this.erroContato.set(`A conta ${usuario.email} nao esta marcada como admin no backend.`);
+          return;
+        }
+
+        this.executarExclusaoProdutoComoAdmin(produto);
+      },
+      error: (err) => {
+        console.error('Erro ao confirmar perfil admin:', err);
+        this.admin.set(false);
+        this.erroContato.set('Sua sessao nao foi reconhecida pelo backend. Saia e entre novamente.');
+      },
+    });
+  }
+
+  private executarExclusaoProdutoComoAdmin(produto: Produto): void {
     this.excluindoProdutoId.set(produto.id);
     this.erroContato.set(null);
 
@@ -197,16 +216,13 @@ export class VitrineComponent implements OnInit {
 
         if (err.status === 401 || err.status === 403) {
           this.carregarPerfilAdmin();
-          const email = this.authService.getUsuarioEmail();
           this.erroContato.set(
-            email
-              ? `A conta ${email} nao tem permissao para excluir este anuncio.`
-              : 'Sua sessao expirou. Entre novamente para excluir anuncios.',
+            err.error?.erro || 'O backend recusou a exclusao. Saia, entre novamente e tente outra vez.',
           );
           return;
         }
 
-        this.erroContato.set(err.error?.erro || 'Não foi possível excluir este anúncio.');
+        this.erroContato.set(err.error?.erro || 'Nao foi possivel excluir este anuncio.');
       },
     });
   }
