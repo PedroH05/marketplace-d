@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,8 +67,9 @@ public class ProdutoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        produtoService.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long id,
+                                        @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        produtoService.excluir(id, authorizationHeader);
         return ResponseEntity.noContent().build();
     }
 }

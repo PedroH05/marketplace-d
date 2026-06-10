@@ -25,13 +25,16 @@ public class ProdutoService {
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
     private final AdminService adminService;
+    private final TokenService tokenService;
 
     public ProdutoService(ProdutoRepository produtoRepository,
                           UsuarioRepository usuarioRepository,
-                          AdminService adminService) {
+                          AdminService adminService,
+                          TokenService tokenService) {
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
         this.adminService = adminService;
+        this.tokenService = tokenService;
     }
 
     @Transactional
@@ -109,8 +112,13 @@ public class ProdutoService {
 
     @Transactional
     public void excluir(Long id) {
+        excluir(id, null);
+    }
+
+    @Transactional
+    public void excluir(Long id, String authorizationHeader) {
         Produto produto = buscarPorId(id);
-        validarDonoOuAdmin(produto);
+        validarDonoOuAdmin(produto, authorizationHeader);
         if (!produtoRepository.existsById(id)) {
             throw new RecursoNaoEncontradoException("Produto não encontrado!");
         }
@@ -177,12 +185,35 @@ public class ProdutoService {
     }
 
     private void validarDonoOuAdmin(Produto produto) {
-        String email = emailUsuarioAutenticado();
+        validarDonoOuAdmin(produto, null);
+    }
+
+    private void validarDonoOuAdmin(Produto produto, String authorizationHeader) {
+        String email = emailUsuarioAutenticado(authorizationHeader);
         boolean dono = produto.getVendedor().getEmail().equalsIgnoreCase(email);
 
         if (!dono && !adminService.ehAdmin(email)) {
             throw new AccessDeniedException("Você não tem permissão para excluir este anúncio.");
         }
+    }
+
+    private String emailUsuarioAutenticado(String authorizationHeader) {
+        String emailDoToken = emailDoToken(authorizationHeader);
+        if (emailDoToken != null) {
+            return emailDoToken;
+        }
+
+        return emailUsuarioAutenticado();
+    }
+
+    private String emailDoToken(String authorizationHeader) {
+        if (authorizationHeader == null || authorizationHeader.isBlank()) {
+            return null;
+        }
+
+        String token = authorizationHeader.replace("Bearer ", "").trim();
+        String email = tokenService.validarToken(token);
+        return email == null || email.isBlank() ? null : email;
     }
 
 }
