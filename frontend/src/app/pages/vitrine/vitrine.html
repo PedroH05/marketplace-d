@@ -14,6 +14,21 @@
     </div>
   </nav>
 
+  <nav class="vitrine-mobile-nav" aria-label="Navegação principal">
+    <a class="mobile-nav-item active" routerLink="/vitrine">Explorar</a>
+
+    @if (authService.isLoggedIn()) {
+      <a class="mobile-nav-item" routerLink="/chats">Mensagens</a>
+      <a class="mobile-nav-item" routerLink="/meus-anuncios">Meus anúncios</a>
+      <button class="mobile-nav-item mobile-nav-action" type="button" (click)="irParaVender()">
+        Anunciar
+      </button>
+    } @else {
+      <a class="mobile-nav-item" routerLink="/login">Entrar</a>
+      <a class="mobile-nav-item mobile-nav-action" routerLink="/cadastro">Cadastrar</a>
+    }
+  </nav>
+
   <div class="vitrine-body">
     <aside class="vitrine-sidebar">
       <h3 class="sidebar-title">Marketplace</h3>
