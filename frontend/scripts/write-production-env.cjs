@@ -9,7 +9,6 @@ const replacements = {
   wsUrl: process.env.FRONTEND_WS_URL,
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
-  adminEmails: process.env.FRONTEND_ADMIN_EMAILS,
 };
 
 const hasBuildVariables = Object.values(replacements).some(Boolean);
@@ -27,35 +26,12 @@ function valueFor(key) {
   return match?.[1] ?? '';
 }
 
-function arrayValueFor(key) {
-  const fromEnv = replacements[key];
-  if (fromEnv) {
-    return fromEnv
-      .split(',')
-      .map((value) => value.trim().toLowerCase())
-      .filter(Boolean);
-  }
-
-  const match = currentContent.match(new RegExp(`${key}:\\s*\\[([^\\]]*)\\]`));
-  if (!match) return [];
-
-  return match[1]
-    .split(',')
-    .map((value) => value.trim().replace(/^['"]|['"]$/g, '').toLowerCase())
-    .filter(Boolean);
-}
-
-function formatArray(values) {
-  return `[${values.map((value) => `'${value.replace(/'/g, "\\'")}'`).join(', ')}]`;
-}
-
 const content = `export const environment = {
   production: true,
   apiUrl: '${valueFor('apiUrl')}',
   wsUrl: '${valueFor('wsUrl')}',
   cloudinaryCloudName: '${valueFor('cloudinaryCloudName')}',
   cloudinaryUploadPreset: '${valueFor('cloudinaryUploadPreset')}',
-  adminEmails: ${formatArray(arrayValueFor('adminEmails'))},
 };
 `;
 

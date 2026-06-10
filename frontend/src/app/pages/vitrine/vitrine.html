@@ -205,7 +205,7 @@
             {{ textoBotaoContato(produtoSelecionado()) }}
           </button>
 
-          @if (authService.isAdmin()) {
+          @if (admin()) {
             <button
               class="btn-excluir-admin"
               type="button"

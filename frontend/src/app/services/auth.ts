@@ -3,6 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface UsuarioLogado {
+  email: string;
+  admin: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -14,6 +19,10 @@ export class AuthService {
 
   registrarVendedor(vendedor: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/usuarios`, vendedor);
+  }
+
+  buscarUsuarioLogado(): Observable<UsuarioLogado> {
+    return this.http.get<UsuarioLogado>(`${this.apiUrl}/auth/me`);
   }
 
   login(credenciais: any): Observable<any> {
@@ -59,13 +68,6 @@ export class AuthService {
     } catch {
       return null;
     }
-  }
-
-  isAdmin(): boolean {
-    const email = this.getUsuarioEmail();
-    if (!email) return false;
-
-    return environment.adminEmails.includes(email.trim().toLowerCase());
   }
 
   private tokenExpirado(token: string): boolean {

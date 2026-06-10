@@ -9,7 +9,6 @@ import com.pedro.marketplace.exception.EstadoInvalidoException;
 import com.pedro.marketplace.exception.RecursoNaoEncontradoException;
 import com.pedro.marketplace.repository.ProdutoRepository;
 import com.pedro.marketplace.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,21 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
-    private final List<String> adminEmails;
+    private final AdminService adminService;
 
     public ProdutoService(ProdutoRepository produtoRepository,
                           UsuarioRepository usuarioRepository,
-                          @Value("${app.admin.emails:}") String adminEmails) {
+                          AdminService adminService) {
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
-        this.adminEmails = normalizarAdminEmails(adminEmails);
+        this.adminService = adminService;
     }
 
     @Transactional
@@ -182,28 +180,9 @@ public class ProdutoService {
         String email = emailUsuarioAutenticado();
         boolean dono = produto.getVendedor().getEmail().equalsIgnoreCase(email);
 
-        if (!dono && !ehAdmin(email)) {
+        if (!dono && !adminService.ehAdmin(email)) {
             throw new AccessDeniedException("Você não tem permissão para excluir este anúncio.");
         }
     }
 
-    private boolean ehAdmin(String email) {
-        if (email == null || email.isBlank()) {
-            return false;
-        }
-
-        return adminEmails.contains(email.trim().toLowerCase(Locale.ROOT));
-    }
-
-    private List<String> normalizarAdminEmails(String emails) {
-        if (emails == null || emails.isBlank()) {
-            return List.of();
-        }
-
-        return List.of(emails.split(","))
-                .stream()
-                .map(email -> email.trim().toLowerCase(Locale.ROOT))
-                .filter(email -> !email.isBlank())
-                .toList();
-    }
 }

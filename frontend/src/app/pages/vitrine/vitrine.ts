@@ -27,11 +27,13 @@ export class VitrineComponent implements OnInit {
   meusProdutoIds = signal<Set<number>>(new Set());
   abrindoChat = signal<boolean>(false);
   excluindoProdutoId = signal<number | null>(null);
+  admin = signal<boolean>(false);
   erroContato = signal<string | null>(null);
 
   ngOnInit(): void {
     this.carregarProdutos();
     this.carregarMeusProdutoIds();
+    this.carregarPerfilAdmin();
   }
 
   carregarProdutos(): void {
@@ -64,6 +66,7 @@ export class VitrineComponent implements OnInit {
     this.chatService.desconectar();
     this.authService.logout();
     this.meusProdutoIds.set(new Set());
+    this.admin.set(false);
     this.router.navigate(['/login']);
   }
 
@@ -168,7 +171,7 @@ export class VitrineComponent implements OnInit {
   }
 
   excluirProdutoComoAdmin(produto: Produto | null): void {
-    if (!produto || !this.authService.isAdmin() || this.excluindoProdutoId()) return;
+    if (!produto || !this.admin() || this.excluindoProdutoId()) return;
 
     const confirmar = confirm(`Deseja excluir o anúncio "${produto.nome}"?`);
     if (!confirmar) return;
@@ -199,6 +202,22 @@ export class VitrineComponent implements OnInit {
       },
       error: () => {
         this.meusProdutoIds.set(new Set());
+      },
+    });
+  }
+
+  private carregarPerfilAdmin(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.admin.set(false);
+      return;
+    }
+
+    this.authService.buscarUsuarioLogado().subscribe({
+      next: (usuario) => {
+        this.admin.set(usuario.admin);
+      },
+      error: () => {
+        this.admin.set(false);
       },
     });
   }
