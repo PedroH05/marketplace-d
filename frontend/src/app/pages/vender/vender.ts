@@ -35,7 +35,7 @@ export class VenderComponent {
   form: FormGroup = this.fb.group({
     nome: ['', [Validators.required, Validators.minLength(3)]],
     preco: ['', [Validators.required, Validators.min(0.01)]],
-    descricao: ['', [Validators.required, Validators.maxLength(500)]],
+    descricao: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
   });
 
   get nomeInvalido(): boolean {
@@ -161,7 +161,8 @@ export class VenderComponent {
       error: (err) => {
         console.error('Erro ao criar produto no Java:', err);
         this.loading.set(false);
-        this.erro.set('Erro ao salvar o produto na base de dados.');
+        const mensagemValidacao = err.error?.erros?.[0] || err.error?.erro;
+        this.erro.set(mensagemValidacao || 'Erro ao salvar o produto na base de dados.');
       },
     });
   }

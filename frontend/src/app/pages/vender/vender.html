@@ -113,7 +113,7 @@
               maxlength="500"
             ></textarea>
             @if (descricaoInvalida) {
-              <div class="invalid-feedback">A descrição é obrigatória.</div>
+              <div class="invalid-feedback">A descrição precisa ter pelo menos 10 caracteres.</div>
             }
             <small class="text-secondary mt-1 d-block">
               {{ form.get('descricao')?.value?.length || 0 }}/500 caracteres
