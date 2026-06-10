@@ -16,7 +16,8 @@ public class AdminService {
     public AdminService(Environment environment) {
         this.adminEmails = normalizarEmails(
                 environment.getProperty("app.admin.emails", ""),
-                environment.getProperty("APP_ADMIN_EMAILS", "")
+                environment.getProperty("APP_ADMIN_EMAILS", ""),
+                System.getenv("APP_ADMIN_EMAILS")
         );
     }
 

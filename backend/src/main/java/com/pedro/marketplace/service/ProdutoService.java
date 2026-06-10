@@ -112,13 +112,13 @@ public class ProdutoService {
 
     @Transactional
     public void excluir(Long id) {
-        excluir(id, null);
+        excluir(id, null, null);
     }
 
     @Transactional
-    public void excluir(Long id, String authorizationHeader) {
+    public void excluir(Long id, Authentication authentication, String authorizationHeader) {
         Produto produto = buscarPorId(id);
-        validarDonoOuAdmin(produto, authorizationHeader);
+        validarDonoOuAdmin(produto, authentication, authorizationHeader);
         if (!produtoRepository.existsById(id)) {
             throw new RecursoNaoEncontradoException("Produto não encontrado!");
         }
@@ -185,11 +185,11 @@ public class ProdutoService {
     }
 
     private void validarDonoOuAdmin(Produto produto) {
-        validarDonoOuAdmin(produto, null);
+        validarDonoOuAdmin(produto, null, null);
     }
 
-    private void validarDonoOuAdmin(Produto produto, String authorizationHeader) {
-        String email = emailUsuarioAutenticado(authorizationHeader);
+    private void validarDonoOuAdmin(Produto produto, Authentication authentication, String authorizationHeader) {
+        String email = emailUsuarioAutenticado(authentication, authorizationHeader);
         boolean dono = produto.getVendedor().getEmail().equalsIgnoreCase(email);
 
         if (!dono && !adminService.ehAdmin(email)) {
@@ -197,13 +197,37 @@ public class ProdutoService {
         }
     }
 
-    private String emailUsuarioAutenticado(String authorizationHeader) {
+    private String emailUsuarioAutenticado(Authentication authentication, String authorizationHeader) {
+        String emailDaAutenticacao = emailDaAutenticacao(authentication);
+        if (emailDaAutenticacao != null) {
+            return emailDaAutenticacao;
+        }
+
         String emailDoToken = emailDoToken(authorizationHeader);
         if (emailDoToken != null) {
             return emailDoToken;
         }
 
         return emailUsuarioAutenticado();
+    }
+
+    private String emailDaAutenticacao(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof Usuario usuario) {
+            return usuario.getEmail();
+        }
+
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getUsername();
+        }
+
+        String email = authentication.getName();
+        return email == null || email.isBlank() ? null : email;
     }
 
     private String emailDoToken(String authorizationHeader) {
