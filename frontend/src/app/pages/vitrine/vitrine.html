@@ -199,10 +199,10 @@
           <button
             class="btn-contato"
             type="button"
-            [disabled]="abrindoChat()"
+            [disabled]="abrindoChat() && !ehMeuProduto(produtoSelecionado())"
             (click)="entrarEmContato(produtoSelecionado())"
           >
-            {{ abrindoChat() ? 'Abrindo conversa...' : 'Entrar em contato' }}
+            {{ textoBotaoContato(produtoSelecionado()) }}
           </button>
         </div>
       </div>

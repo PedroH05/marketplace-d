@@ -24,11 +24,13 @@ export class VitrineComponent implements OnInit {
   erro = signal<string | null>(null);
   produtoSelecionado = signal<Produto | null>(null);
   indicesImagem = signal<Record<number, number>>({});
+  meusProdutoIds = signal<Set<number>>(new Set());
   abrindoChat = signal<boolean>(false);
   erroContato = signal<string | null>(null);
 
   ngOnInit(): void {
     this.carregarProdutos();
+    this.carregarMeusProdutoIds();
   }
 
   carregarProdutos(): void {
@@ -52,9 +54,15 @@ export class VitrineComponent implements OnInit {
     this.router.navigate(['/vender']);
   }
 
+  irParaMeusAnuncios(): void {
+    this.fecharModal();
+    this.router.navigate(['/meus-anuncios']);
+  }
+
   logout(): void {
     this.chatService.desconectar();
     this.authService.logout();
+    this.meusProdutoIds.set(new Set());
     this.router.navigate(['/login']);
   }
 
@@ -73,6 +81,11 @@ export class VitrineComponent implements OnInit {
 
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.ehMeuProduto(produto)) {
+      this.irParaMeusAnuncios();
       return;
     }
 
@@ -140,5 +153,30 @@ export class VitrineComponent implements OnInit {
   corPlaceholder(id: number): string {
     const cores = ['#e3f2fd', '#fce4ec', '#f3e5f5', '#efebe9', '#e8f5e9', '#fff3e0'];
     return cores[id % cores.length] || '#e0e0e0';
+  }
+
+  ehMeuProduto(produto: Produto | null | undefined): boolean {
+    if (!produto || !this.authService.isLoggedIn()) return false;
+    return this.meusProdutoIds().has(produto.id);
+  }
+
+  textoBotaoContato(produto: Produto | null): string {
+    if (this.ehMeuProduto(produto)) return 'Ver meus anúncios';
+    if (this.abrindoChat()) return 'Abrindo conversa...';
+    return 'Entrar em contato';
+  }
+
+  private carregarMeusProdutoIds(): void {
+    const email = this.authService.getUsuarioEmail();
+    if (!email) return;
+
+    this.produtoService.listarPorVendedor(email).subscribe({
+      next: (produtos) => {
+        this.meusProdutoIds.set(new Set((produtos || []).map((produto) => produto.id)));
+      },
+      error: () => {
+        this.meusProdutoIds.set(new Set());
+      },
+    });
   }
 }
