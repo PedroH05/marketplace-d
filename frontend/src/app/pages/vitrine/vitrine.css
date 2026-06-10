@@ -64,6 +64,53 @@
   gap: 0.6rem;
 }
 
+.navbar-actions .btn {
+  min-height: 42px;
+  border-radius: 999px !important;
+  padding: 0.6rem 1.15rem !important;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition:
+    background 0.18s,
+    border-color 0.18s,
+    color 0.18s,
+    transform 0.18s;
+}
+
+.navbar-actions .btn:hover {
+  transform: translateY(-1px);
+}
+
+.navbar-actions .btn-outline-success {
+  border-color: rgba(26, 122, 60, 0.22);
+  color: var(--accent);
+  background: #ffffff;
+}
+
+.navbar-actions .btn-outline-success:hover {
+  border-color: rgba(26, 122, 60, 0.3);
+  background: var(--accent-light);
+  color: var(--accent-hover);
+}
+
+.navbar-actions .btn-success {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(26, 122, 60, 0.16);
+}
+
+.navbar-actions .btn-success:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
 .btn-sair {
   border: 1px solid transparent;
   border-radius: 999px;
@@ -465,8 +512,9 @@
   }
 
   .navbar-actions .btn {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    min-height: 42px;
+    padding: 0.58rem 0.95rem !important;
+    font-size: 0.9rem;
   }
 
   .btn-sair {
