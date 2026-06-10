@@ -6,6 +6,11 @@ import { ProdutoService } from '../../services/produto.service';
 import { AuthService } from '../../services/auth';
 import { Produto, ProdutoRequest } from '../../models/produto.model';
 import { environment } from '../../../environments/environment';
+import {
+  formatPrecoBrasileiro,
+  parsePrecoBrasileiro,
+  precoBrasileiroValidator,
+} from '../../utils/preco-br';
 
 type ImagemSelecionada = {
   file: File;
@@ -44,7 +49,7 @@ export class MeusAnunciosComponent implements OnInit {
 
   formEdicao: FormGroup = this.fb.group({
     nome: ['', [Validators.required, Validators.minLength(3)]],
-    preco: [null, [Validators.required, Validators.min(0.01)]],
+    preco: ['', [Validators.required, precoBrasileiroValidator]],
     descricao: ['', [Validators.minLength(10)]],
   });
 
@@ -83,7 +88,7 @@ export class MeusAnunciosComponent implements OnInit {
     this.novasImagensPreview.set([]);
     this.formEdicao.patchValue({
       nome: produto.nome,
-      preco: produto.preco,
+      preco: formatPrecoBrasileiro(produto.preco),
       descricao: produto.descricao || '',
     });
   }
@@ -140,6 +145,15 @@ export class MeusAnunciosComponent implements OnInit {
     this.atualizarNovasPreviews();
   }
 
+  formatarPrecoEdicao(): void {
+    const controle = this.formEdicao.get('preco');
+    const precoFormatado = formatPrecoBrasileiro(controle?.value);
+
+    if (precoFormatado) {
+      controle?.setValue(precoFormatado, { emitEvent: false });
+    }
+  }
+
   async salvarEdicao(): Promise<void> {
     if (this.formEdicao.invalid) {
       this.formEdicao.markAllAsTouched();
@@ -158,13 +172,12 @@ export class MeusAnunciosComponent implements OnInit {
       );
 
       const imagemUrls = [...this.imagensEdicao(), ...novasUrls];
-      const precoRaw = this.formEdicao.value.preco;
+      const descricao = this.formEdicao.value.descricao?.trim();
 
       const payload: ProdutoRequest = {
         nome: this.formEdicao.value.nome.trim(),
-        preco:
-          typeof precoRaw === 'string' ? parseFloat(precoRaw.replace(',', '.')) : Number(precoRaw),
-        descricao: this.formEdicao.value.descricao?.trim() || '',
+        preco: parsePrecoBrasileiro(this.formEdicao.value.preco),
+        descricao: descricao || undefined,
         imagemUrl: imagemUrls[0] ?? null,
         imagemUrls,
       };
@@ -177,7 +190,8 @@ export class MeusAnunciosComponent implements OnInit {
         },
         error: (err) => {
           this.salvando.set(false);
-          this.erroEdicao.set(err.error?.erro || 'Erro ao salvar. Tente novamente.');
+          const mensagemValidacao = err.error?.erros?.[0] || err.error?.erro;
+          this.erroEdicao.set(mensagemValidacao || 'Erro ao salvar. Tente novamente.');
         },
       });
     } catch (error) {

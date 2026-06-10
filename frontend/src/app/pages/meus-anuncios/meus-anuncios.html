@@ -125,16 +125,17 @@
           <div class="input-prefix">
             <span class="prefix">R$</span>
             <input
-              type="number"
+              type="text"
               class="campo-input"
               formControlName="preco"
-              placeholder="0,00"
-              min="0"
-              step="0.01"
+              placeholder="Ex: 39,90"
+              inputmode="decimal"
+              autocomplete="off"
+              (blur)="formatarPrecoEdicao()"
             />
           </div>
           @if (formEdicao.get('preco')?.invalid && formEdicao.get('preco')?.touched) {
-            <span class="campo-erro">Digite um preço válido.</span>
+            <span class="campo-erro">Digite um preço válido, como 39,90.</span>
           }
         </div>
 

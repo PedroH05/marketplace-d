@@ -86,16 +86,17 @@
             <div class="input-group input-group-lg">
               <span class="input-group-text">R$</span>
               <input
-                type="number"
+                type="text"
                 class="form-control"
                 [class.is-invalid]="precoInvalido"
                 formControlName="preco"
-                placeholder="0,00"
-                min="0"
-                step="0.01"
+                placeholder="Ex: 39,90"
+                inputmode="decimal"
+                autocomplete="off"
+                (blur)="formatarPrecoNoFormulario()"
               />
               @if (precoInvalido) {
-                <div class="invalid-feedback">Digite um preço válido.</div>
+                <div class="invalid-feedback">Digite um preço válido, como 39,90.</div>
               }
             </div>
           </div>
@@ -116,7 +117,7 @@
               <div class="invalid-feedback">A descrição precisa ter pelo menos 10 caracteres.</div>
             }
             <small class="text-secondary mt-1 d-block">
-              {{ form.get('descricao')?.value?.length || 0 }}/500 caracteres
+              Mínimo 10 caracteres · {{ form.get('descricao')?.value?.length || 0 }}/500
             </small>
           </div>
 

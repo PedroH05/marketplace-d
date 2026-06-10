@@ -4,6 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { ProdutoService } from '../../services/produto.service';
 import { environment } from '../../../environments/environment';
+import {
+  formatPrecoBrasileiro,
+  parsePrecoBrasileiro,
+  precoBrasileiroValidator,
+} from '../../utils/preco-br';
 
 type ImagemSelecionada = {
   file: File;
@@ -34,7 +39,7 @@ export class VenderComponent {
 
   form: FormGroup = this.fb.group({
     nome: ['', [Validators.required, Validators.minLength(3)]],
-    preco: ['', [Validators.required, Validators.min(0.01)]],
+    preco: ['', [Validators.required, precoBrasileiroValidator]],
     descricao: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
   });
 
@@ -92,6 +97,15 @@ export class VenderComponent {
     this.atualizarPreviews();
   }
 
+  formatarPrecoNoFormulario(): void {
+    const controle = this.form.get('preco');
+    const precoFormatado = formatPrecoBrasileiro(controle?.value);
+
+    if (precoFormatado) {
+      controle?.setValue(precoFormatado, { emitEvent: false });
+    }
+  }
+
   async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -147,9 +161,9 @@ export class VenderComponent {
 
   private salvarNoJava(imagemUrls: string[]): void {
     const novoProduto = {
-      nome: this.form.value.nome,
-      preco: parseFloat(this.form.value.preco),
-      descricao: this.form.value.descricao,
+      nome: this.form.value.nome.trim(),
+      preco: parsePrecoBrasileiro(this.form.value.preco),
+      descricao: this.form.value.descricao.trim(),
       imagemUrl: imagemUrls[0] ?? null,
       imagemUrls,
     };
