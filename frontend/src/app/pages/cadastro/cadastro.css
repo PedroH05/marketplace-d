@@ -81,6 +81,19 @@
   border-radius: 0 8px 8px 0 !important;
 }
 
+.cadastro-wrapper .input-group .input-senha {
+  border-radius: 8px 0 0 8px !important;
+}
+
+.cadastro-wrapper .btn-outline-secondary {
+  background-color: #e4e6ea !important;
+  border: 1px solid #ccd0d5 !important;
+  border-radius: 0 8px 8px 0 !important;
+  color: #1c1e21 !important;
+  font-weight: 700;
+  min-width: 92px;
+}
+
 .cadastro-wrapper a {
   color: #1a7a3c !important;
 }

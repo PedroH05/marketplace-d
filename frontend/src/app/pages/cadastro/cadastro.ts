@@ -19,6 +19,7 @@ export class CadastroComponent {
   loading = signal<boolean>(false);
   erro = signal<string | null>(null);
   sucesso = signal<boolean>(false);
+  mostrarSenha = signal<boolean>(false);
 
   form: FormGroup = this.fb.group({
     nome: ['', [Validators.required, Validators.minLength(3)]],
@@ -45,6 +46,10 @@ export class CadastroComponent {
   get senhaInvalida(): boolean {
     const campo = this.form.get('senha');
     return !!(campo && campo.invalid && (campo.dirty || campo.touched));
+  }
+
+  toggleSenha(): void {
+    this.mostrarSenha.update((state) => !state);
   }
 
   onSubmit(): void {

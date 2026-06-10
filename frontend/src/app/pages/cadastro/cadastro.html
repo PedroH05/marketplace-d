@@ -67,16 +67,27 @@
 
         <div class="mb-4">
           <label class="form-label">Senha</label>
-          <input
-            type="password"
-            class="form-control"
-            [class.is-invalid]="senhaInvalida"
-            formControlName="senha"
-            placeholder="Mínimo 6 caracteres"
-          />
-          @if (senhaInvalida) {
-            <div class="invalid-feedback">A senha deve ter no mínimo 6 caracteres.</div>
-          }
+          <div class="input-group">
+            <input
+              [type]="mostrarSenha() ? 'text' : 'password'"
+              class="form-control input-senha"
+              [class.is-invalid]="senhaInvalida"
+              formControlName="senha"
+              placeholder="Mínimo 6 caracteres"
+              autocomplete="new-password"
+            />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="toggleSenha()"
+              [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              {{ mostrarSenha() ? 'Ocultar' : 'Mostrar' }}
+            </button>
+            @if (senhaInvalida) {
+              <div class="invalid-feedback">A senha deve ter no mínimo 6 caracteres.</div>
+            }
+          </div>
         </div>
 
         <button type="submit" class="btn btn-success w-100 py-2" [disabled]="loading() || sucesso()">
