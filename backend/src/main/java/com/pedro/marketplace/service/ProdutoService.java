@@ -15,6 +15,7 @@ import com.pedro.marketplace.repository.UsuarioRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +52,7 @@ public class ProdutoService {
                 .getAuthentication()
                 .getName();
 
-        Usuario vendedor = usuarioRepository.findByEmail(email)
+        Usuario vendedor = usuarioRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Vendedor não encontrado!"));
 
         Produto produto = new Produto();
@@ -127,9 +128,6 @@ public class ProdutoService {
     public void excluir(Long id, Authentication authentication, String authorizationHeader) {
         Produto produto = buscarPorId(id);
         validarDonoOuAdmin(produto, authentication, authorizationHeader);
-        if (!produtoRepository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Produto não encontrado!");
-        }
 
         excluirConversasDoProduto(id);
         produtoRepository.delete(produto);
@@ -146,7 +144,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponseDTO> listarProdutosDoVendedorPorEmail(String email) {
-        Usuario vendedor = usuarioRepository.findByEmail(email)
+        Usuario vendedor = usuarioRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Vendedor não encontrado!"));
 
         return produtoRepository.findByVendedorId(vendedor.getId())
@@ -179,7 +177,9 @@ public class ProdutoService {
     private String emailUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
             throw new PermissaoNegadaException("Usuário não autenticado.");
         }
 
@@ -231,7 +231,9 @@ public class ProdutoService {
     }
 
     private String emailDaAutenticacao(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
             return null;
         }
 
@@ -254,7 +256,9 @@ public class ProdutoService {
             return null;
         }
 
-        String token = authorizationHeader.replace("Bearer ", "").trim();
+        String token = authorizationHeader.regionMatches(true, 0, "Bearer ", 0, 7)
+                ? authorizationHeader.substring(7).trim()
+                : authorizationHeader.trim();
         String email = tokenService.validarToken(token);
         return email == null || email.isBlank() ? null : email;
     }

@@ -33,6 +33,10 @@ public class SecurityConfig {
                     response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
                     response.getWriter().write("{\"erro\":\"Usuario nao autenticado.\"}");
+                }).accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"erro\":\"Usuario sem permissao para esta acao.\"}");
                 }))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll();

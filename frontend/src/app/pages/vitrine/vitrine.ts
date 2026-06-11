@@ -182,22 +182,7 @@ export class VitrineComponent implements OnInit {
     const confirmar = confirm(`Deseja excluir o anúncio "${produto.nome}"?`);
     if (!confirmar) return;
 
-    this.authService.buscarUsuarioLogado().subscribe({
-      next: (usuario) => {
-        if (!usuario.admin) {
-          this.admin.set(false);
-          this.erroContato.set(`A conta ${usuario.email} nao esta marcada como admin no backend.`);
-          return;
-        }
-
-        this.executarExclusaoProdutoComoAdmin(produto);
-      },
-      error: (err) => {
-        console.error('Erro ao confirmar perfil admin:', err);
-        this.admin.set(false);
-        this.erroContato.set('Sua sessao nao foi reconhecida pelo backend. Saia e entre novamente.');
-      },
-    });
+    this.executarExclusaoProdutoComoAdmin(produto);
   }
 
   private executarExclusaoProdutoComoAdmin(produto: Produto): void {

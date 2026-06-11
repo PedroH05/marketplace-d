@@ -26,14 +26,18 @@ public class AdminService {
             return false;
         }
 
-        return adminEmails.contains(email.trim().toLowerCase());
+        return adminEmails.contains(normalizarEmail(email));
     }
 
     private Set<String> normalizarEmails(String... fontes) {
         return Arrays.stream(fontes)
-                .flatMap(fonte -> fonte == null ? Stream.empty() : Arrays.stream(fonte.split(",")))
-                .map(email -> email.trim().toLowerCase())
+                .flatMap(fonte -> fonte == null ? Stream.empty() : Arrays.stream(fonte.split("[,;\\s]+")))
+                .map(this::normalizarEmail)
                 .filter(email -> !email.isBlank())
                 .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private String normalizarEmail(String email) {
+        return email.trim().replace("\"", "").replace("'", "").toLowerCase();
     }
 }

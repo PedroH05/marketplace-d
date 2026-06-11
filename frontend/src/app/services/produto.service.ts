@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Produto, ProdutoRequest } from '../models/produto.model';
 import { environment } from '../../environments/environment';
@@ -19,12 +19,7 @@ export class ProdutoService {
   }
 
   excluirProduto(id: number): Observable<void> {
-    const token = localStorage.getItem('token_desapego');
-    const options = token
-      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
-      : {};
-
-    return this.http.delete<void>(`${this.API}/produtos/${id}`, options);
+    return this.http.delete<void>(`${this.API}/produtos/${id}`);
   }
 
   venderProduto(id: number): Observable<Produto> {

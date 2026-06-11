@@ -43,7 +43,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 var email = tokenService.validarToken(tokenJWT);
 
                 if (email != null && !email.isBlank()) {
-                    UserDetails usuario = repository.findByEmail(email).orElse(null);
+                    UserDetails usuario = repository.findByEmailIgnoreCase(email).orElse(null);
 
                     if (usuario != null) {
                         var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
@@ -60,8 +60,8 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private String recuperarToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null) {
-            return authorizationHeader.replace("Bearer ", "");
+        if (authorizationHeader != null && authorizationHeader.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            return authorizationHeader.substring(7).trim();
         }
         return null;
     }
