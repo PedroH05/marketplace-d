@@ -219,8 +219,13 @@ export class MeusAnunciosComponent implements OnInit {
       },
       error: (err) => {
         this.excluindoId.set(null);
-        if (err.status === 401 || err.status === 403) {
+        if (err.status === 401) {
           this.erroAcao.set('Sua sessão expirou. Saia e entre novamente para excluir o anúncio.');
+          return;
+        }
+
+        if (err.status === 403) {
+          this.erroAcao.set(err.error?.erro || 'Voce nao tem permissao para excluir este anuncio.');
           return;
         }
 

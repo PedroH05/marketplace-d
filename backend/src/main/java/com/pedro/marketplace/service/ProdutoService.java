@@ -6,10 +6,12 @@ import com.pedro.marketplace.entity.Produto;
 import com.pedro.marketplace.entity.StatusProduto;
 import com.pedro.marketplace.entity.Usuario;
 import com.pedro.marketplace.exception.EstadoInvalidoException;
+import com.pedro.marketplace.exception.PermissaoNegadaException;
 import com.pedro.marketplace.exception.RecursoNaoEncontradoException;
+import com.pedro.marketplace.repository.ChatRepository;
+import com.pedro.marketplace.repository.MensagemRepository;
 import com.pedro.marketplace.repository.ProdutoRepository;
 import com.pedro.marketplace.repository.UsuarioRepository;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,15 +26,21 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ChatRepository chatRepository;
+    private final MensagemRepository mensagemRepository;
     private final AdminService adminService;
     private final TokenService tokenService;
 
     public ProdutoService(ProdutoRepository produtoRepository,
                           UsuarioRepository usuarioRepository,
+                          ChatRepository chatRepository,
+                          MensagemRepository mensagemRepository,
                           AdminService adminService,
                           TokenService tokenService) {
         this.produtoRepository = produtoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.chatRepository = chatRepository;
+        this.mensagemRepository = mensagemRepository;
         this.adminService = adminService;
         this.tokenService = tokenService;
     }
@@ -123,7 +131,18 @@ public class ProdutoService {
             throw new RecursoNaoEncontradoException("Produto não encontrado!");
         }
 
+        excluirConversasDoProduto(id);
         produtoRepository.delete(produto);
+    }
+
+    private void excluirConversasDoProduto(Long produtoId) {
+        List<Long> chatIds = chatRepository.findIdsByProdutoId(produtoId);
+        if (chatIds.isEmpty()) {
+            return;
+        }
+
+        mensagemRepository.deleteByChatIds(chatIds);
+        chatRepository.deleteByProdutoId(produtoId);
     }
 
     public List<ProdutoResponseDTO> listarProdutosDoVendedorPorEmail(String email) {
@@ -161,7 +180,7 @@ public class ProdutoService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AccessDeniedException("Usuário não autenticado.");
+            throw new PermissaoNegadaException("Usuário não autenticado.");
         }
 
         Object principal = authentication.getPrincipal();
@@ -180,7 +199,7 @@ public class ProdutoService {
     private void validarDonoDoProduto(Produto produto) {
         String email = emailUsuarioAutenticado();
         if (!produto.getVendedor().getEmail().equalsIgnoreCase(email)) {
-            throw new AccessDeniedException("Você só pode alterar seus próprios anúncios.");
+            throw new PermissaoNegadaException("Você só pode alterar seus próprios anúncios.");
         }
     }
 
@@ -193,7 +212,7 @@ public class ProdutoService {
         boolean dono = produto.getVendedor().getEmail().equalsIgnoreCase(email);
 
         if (!dono && !adminService.ehAdmin(email)) {
-            throw new AccessDeniedException("Você não tem permissão para excluir este anúncio.");
+            throw new PermissaoNegadaException("Você não tem permissão para excluir este anúncio.");
         }
     }
 

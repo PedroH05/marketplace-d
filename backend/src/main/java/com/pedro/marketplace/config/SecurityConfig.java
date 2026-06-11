@@ -29,17 +29,17 @@ public class SecurityConfig {
                 .cors(org.springframework.security.config.Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"erro\":\"Usuario nao autenticado.\"}");
+                }))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll();
                     req.requestMatchers("/api/usuarios", "/api/usuarios/**", "/usuarios/**").permitAll();
                     req.requestMatchers("/api/login", "/api/login/**", "/login/**").permitAll();
                     req.requestMatchers("/api/auth/**").permitAll();
                     req.requestMatchers("/ws-desapego", "/ws-desapego/**").permitAll();
-                    req.requestMatchers(
-                            org.springframework.http.HttpMethod.DELETE,
-                            "/produtos/**",
-                            "/api/produtos/**"
-                    ).permitAll();
                     req.requestMatchers(
                             org.springframework.http.HttpMethod.GET,
                             "/produtos",
